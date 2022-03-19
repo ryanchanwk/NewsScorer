@@ -1,8 +1,10 @@
 version: '3.8'
 
 services:
-  websource:
+
+  web:
     build: .
+    image: 'websource'
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/usr/src/app/
@@ -12,12 +14,14 @@ services:
       - ./env/.env
     depends_on:
       - db
+
   db:
     image: postgres:alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./env/.env
+
   redis:
     container_name: redis
     image: redis:alpine
@@ -25,6 +29,42 @@ services:
       - 6379:6379
     volumes:
       - redisdata:/data
+
+  celery_worker:
+    build:
+      context: .
+    image: 'websource'
+    env_file:
+      - ./env/.env
+    command: 'python -m celery -A news_grabber worker -l info -P prefork -Q normal'
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
+  celery_worker_tf:
+    build:
+      context: .
+    image: 'websource'
+    env_file:
+      - ./env/.env
+    command: 'python -m celery -A news_grabber worker -l info -P prefork -n tf_worker -Q tf'
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
+  celery_beat:
+    build:
+      context: .
+    image: 'websource'
+    env_file:
+      - ./env/.env
+    command: 'python -m celery -A news_grabber beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler'
+    volumes_from:
+      - web
+    depends_on:
+      - web
 
 
 volumes:
