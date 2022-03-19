@@ -7,7 +7,7 @@ import django
 django.setup()
 
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-from news_store.models import NewsSource, NewsStore, SentimentStore, SentimentSource
+from news_store.models import NewsSource, NewsStore, SentimentStore, SentimentSource, NewsSourceTag
 
 LOCAL_TZ_STR = "Asia/Hong_Kong"
 
@@ -15,6 +15,7 @@ LOCAL_TZ_STR = "Asia/Hong_Kong"
 def delete_all_news_sentiment_data():
     SentimentStore.objects.all().delete()
     SentimentSource.objects.all().delete()
+    NewsSourceTag.objects.all().delete()
     NewsStore.objects.all().delete()
     NewsSource.objects.all().delete()
     PeriodicTask.objects.exclude(name='celery.backend_cleanup').delete()
@@ -33,6 +34,8 @@ def create_news_sources():
                    source_timezone=LOCAL_TZ_STR),
         NewsSource(source_name="Fox_Business", source_url="https://www.foxbusiness.com/markets/",
                    parent_url="foxbusiness.com"),
+        NewsSource(source_name="Bloomberg", source_url="https://www.bloomberg.com/",
+                   parent_url="bloomberg.com", source_timezone=LOCAL_TZ_STR),
         NewsSource(source_name="Yahoo_Finance", source_url="https://finance.yahoo.com/", parent_url="finance.yahoo.com",
                    source_timezone=LOCAL_TZ_STR, is_integrate_source=True),
         NewsSource(source_name="WSJ", source_url="https://www.wsj.com/news/latest-headlines?mod=wsjheader",
@@ -51,8 +54,8 @@ def create_news_sources():
 def create_sentiment_source():
     SentimentSource.objects.create(source_name="cardiffnlp-twitter-roberta-finetune-news",
                                    token_model_name="cardiffnlp/twitter-roberta-base-sentiment",
-                                   config_path="/usr/src/app/nlp_package/cardiffnlp-twitter-roberta-base-sentiment.json",
-                                   weight_path="/usr/src/app/nlp_package/customized_cardiffnlp-twitter-roberta-base-sentiment.h5"
+                                   config_path="/usr/src/app/news_scorer/nlp_package/cardiffnlp-twitter-roberta-base-sentiment.json",
+                                   weight_path="/usr/src/app/news_scorer/nlp_package/customized_cardiffnlp-twitter-roberta-base-sentiment.h5"
                                    )
     print("finish create_sentiment_source. ")
 

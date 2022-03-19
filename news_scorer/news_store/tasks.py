@@ -38,7 +38,9 @@ def parse_news(name: str):
     parser = PARSER_MAP[name]
     news_source_parser = parser(news_source)
     parsed_data = news_source_parser.run()
-    with open(f'/{settings.BASE_DIR}/temp_store/{news_source.id}-{uuid_str}.pickle', 'wb') as handle:
+    if not os.path.exists(f'{settings.BASE_DIR}/temp_store'):
+        os.makedirs(f'{settings.BASE_DIR}/temp_store')
+    with open(f'{settings.BASE_DIR}/temp_store/{news_source.id}-{uuid_str}.pickle', 'wb') as handle:
         pickle.dump(parsed_data, handle)
     logger.info(f'{len(parsed_data)} data are dumped.')
 
@@ -46,10 +48,12 @@ def parse_news(name: str):
 @shared_task(name='news_uploader', bind=True)
 def news_uploader(self):
     pattern = '*.pickle'
-    file_list = [file for file in os.listdir(f'/{settings.BASE_DIR}/temp_store') if fnmatch.fnmatch(file, pattern)]
+    if not os.path.exists(f'{settings.BASE_DIR}/temp_store'):
+        os.makedirs(f'{settings.BASE_DIR}/temp_store')
+    file_list = [file for file in os.listdir(f'{settings.BASE_DIR}/temp_store') if fnmatch.fnmatch(file, pattern)]
 
     for file in file_list:
-        with open(os.path.join(f'/{settings.BASE_DIR}/temp_store', file), 'rb') as handle:
+        with open(os.path.join(f'{settings.BASE_DIR}/temp_store', file), 'rb') as handle:
             data = pickle.load(handle)
         new_source_num, _ = file.split('-', 1)
         news_source = NewsSource.objects.get(pk=int(new_source_num))
@@ -76,9 +80,11 @@ def news_uploader(self):
                 continue
 
         logger.info(f'data are uploaded to db.')
-        shutil.copyfile(os.path.join(f'/{settings.BASE_DIR}/temp_store', file),
-                        os.path.join(f'/{settings.BASE_DIR}/archive', file))
-        os.remove(os.path.join(f'/{settings.BASE_DIR}/temp_store', file))
+        if not os.path.exists(f'{settings.BASE_DIR}/archive'):
+            os.makedirs(f'{settings.BASE_DIR}/archive')
+        shutil.copyfile(os.path.join(f'{settings.BASE_DIR}/temp_store', file),
+                        os.path.join(f'{settings.BASE_DIR}/archive', file))
+        os.remove(os.path.join(f'{settings.BASE_DIR}/temp_store', file))
 
 
 @shared_task(name='single_tf_predict')
