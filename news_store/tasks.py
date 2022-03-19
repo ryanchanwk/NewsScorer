@@ -38,7 +38,7 @@ def parse_news(name: str):
     parser = PARSER_MAP[name]
     news_source_parser = parser(news_source)
     parsed_data = news_source_parser.run()
-    with open(f'{settings.BASE_DIR}\\temp_store\\{news_source.id}-{uuid_str}.pickle', 'wb') as handle:
+    with open(f'/{settings.BASE_DIR}/temp_store/{news_source.id}-{uuid_str}.pickle', 'wb') as handle:
         pickle.dump(parsed_data, handle)
     logger.info(f'{len(parsed_data)} data are dumped.')
 
@@ -46,10 +46,10 @@ def parse_news(name: str):
 @shared_task(name='news_uploader', bind=True)
 def news_uploader(self):
     pattern = '*.pickle'
-    file_list = [file for file in os.listdir(f'{settings.BASE_DIR}\\temp_store') if fnmatch.fnmatch(file, pattern)]
+    file_list = [file for file in os.listdir(f'/{settings.BASE_DIR}/temp_store') if fnmatch.fnmatch(file, pattern)]
 
     for file in file_list:
-        with open(os.path.join(f'{settings.BASE_DIR}\\temp_store', file), 'rb') as handle:
+        with open(os.path.join(f'/{settings.BASE_DIR}/temp_store', file), 'rb') as handle:
             data = pickle.load(handle)
         new_source_num, _ = file.split('-', 1)
         news_source = NewsSource.objects.get(pk=int(new_source_num))
@@ -76,9 +76,9 @@ def news_uploader(self):
                 continue
 
         logger.info(f'data are uploaded to db.')
-        shutil.copyfile(os.path.join(f'{settings.BASE_DIR}\\temp_store', file),
-                        os.path.join(f'{settings.BASE_DIR}\\archive', file))
-        os.remove(os.path.join(f'{settings.BASE_DIR}\\temp_store', file))
+        shutil.copyfile(os.path.join(f'/{settings.BASE_DIR}/temp_store', file),
+                        os.path.join(f'/{settings.BASE_DIR}/archive', file))
+        os.remove(os.path.join(f'/{settings.BASE_DIR}/temp_store', file))
 
 
 @shared_task(name='single_tf_predict')
@@ -109,9 +109,12 @@ def main(source_name):
     logger.info(f"Creating training ds...")
     test_tfds = dataset_generator(tokenizer, testing_sentence_array, BATCH_SIZE)
     logger.info(f"Initializing pretrain model...")
-    model = TFAutoModelForSequenceClassification.from_pretrained(
-        pretrained_model_name_or_path=sentiment_source.pretrain_model_path,
-        config=sentiment_source.pretrain_model_config_path)
+    if (sentiment_source.pretrain_model_path is None) or (config is None):
+        model = TFAutoModelForSequenceClassification.from_pretrained(sentiment_source.token_model_name)
+    else:
+        model = TFAutoModelForSequenceClassification.from_pretrained(
+            pretrained_model_name_or_path=sentiment_source.pretrain_model_path,
+            config=sentiment_source.pretrain_model_config_path)
     logger.info(f"Loading model weights...")
     model.load_weights(sentiment_source.weight_path)
     raw_predicted_result = model.predict(test_tfds)
