@@ -5,13 +5,13 @@ services:
   web:
     build: .
     image: 'websource'
-    command: python manage.py runserver 0.0.0.0:8000
+    command: bash -c "cd news_scorer && python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/usr/src/app/
+      - .:/usr/src/app
     ports:
       - 8000:8000
     env_file:
-      - ./env/.env
+      - ./news_scorer/env/.env
     depends_on:
       - db
 
@@ -20,7 +20,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ./env/.env
+      - ./news_scorer/env/.env
 
   redis:
     container_name: redis
@@ -35,8 +35,8 @@ services:
       context: .
     image: 'websource'
     env_file:
-      - ./env/.env
-    command: 'python -m celery -A news_grabber worker -l info -P prefork -Q normal'
+      - ./news_scorer/env/.env
+    command: bash -c "cd news_scorer && python -m celery -A news_grabber worker -l info -P prefork -Q normal"
     volumes_from:
       - web
     depends_on:
@@ -47,8 +47,8 @@ services:
       context: .
     image: 'websource'
     env_file:
-      - ./env/.env
-    command: 'python -m celery -A news_grabber worker -l info -P prefork -n tf_worker -Q tf'
+      - ./news_scorer/env/.env
+    command: bash -c "cd news_scorer && python -m celery -A news_grabber worker -l info -P prefork -n tf_worker -Q tf"
     volumes_from:
       - web
     depends_on:
@@ -59,8 +59,8 @@ services:
       context: .
     image: 'websource'
     env_file:
-      - ./env/.env
-    command: 'python -m celery -A news_grabber beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler'
+      - ./news_scorer/env/.env
+    command: bash -c "cd news_scorer && python -m celery -A news_grabber beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     volumes_from:
       - web
     depends_on:
