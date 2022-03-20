@@ -1,9 +1,9 @@
 # NewsScorer
 
-## Simple News parser and sentiment analyser with Django + Redis + Celery + TF + Huggingface NLP model
+## Simple News parser and sentiment analyser with Django + Redis + Celery + Tensorflow + Huggingface NLP model
 
 ### Introduction
-This django system can parse news websites, including Finviz, Reuters and WSF, and store data into PostgresDB.
+This django system can parse news websites, including Finviz, Reuters and WSJ, and store data into PostgresDB.
 
 These data then passed to NLP model (cardiffnlp/twitter-roberta-base-sentiment) with customized model weight (nlp_package) to obtain sentiment score (0: negative, 1:neutral, 2:positive)
 
@@ -25,6 +25,7 @@ POSTGRES_PASSWORD=postgres_pw
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
 LOCAL_TZ_STR=Asia/Hong_Kong
+DJANGO_SECRET_KEY={pls replace this}
 ```
 2. Download nlp_package content to /news_scorer/news_scorer/nlp_package
    Link: https://drive.google.com/file/d/1-O3PvgQ4iJnPKuSt7NHwuO5bSmNJhioB/view?usp=sharing
