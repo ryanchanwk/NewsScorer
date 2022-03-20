@@ -1,4 +1,5 @@
 import os
+import dotenv
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'news_grabber.settings')
 
@@ -9,14 +10,14 @@ django.setup()
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from news_store.models import NewsSource, NewsStore, SentimentStore, SentimentSource, NewsSourceTag
 
-LOCAL_TZ_STR = "Asia/Hong_Kong"
+LOCAL_TZ_STR = os.environ.get('LOCAL_TZ_STR', '')
 
 
 def delete_all_news_sentiment_data():
     SentimentStore.objects.all().delete()
     SentimentSource.objects.all().delete()
-    NewsSourceTag.objects.all().delete()
     NewsStore.objects.all().delete()
+    NewsSourceTag.objects.all().delete()
     NewsSource.objects.all().delete()
     PeriodicTask.objects.exclude(name='celery.backend_cleanup').delete()
     print("finish delete all news and sentiment data. ")
@@ -61,9 +62,9 @@ def create_sentiment_source():
 
 
 def create_periodic_task():
-    parse_cron = CrontabSchedule.objects.create(minute="0,15,30,45")
-    upload_cron = CrontabSchedule.objects.create(minute="5,20,35,50")
-    predict_cron = CrontabSchedule.objects.create(minute="10,25,40,55")
+    parse_cron = CrontabSchedule.objects.create(minute="0,15,30,45", timezone=LOCAL_TZ_STR)
+    upload_cron = CrontabSchedule.objects.create(minute="5,20,35,50", timezone=LOCAL_TZ_STR)
+    predict_cron = CrontabSchedule.objects.create(minute="10,25,40,55", timezone=LOCAL_TZ_STR)
 
     tasks = [PeriodicTask(name='parse_news_wsj', task='parse_news', crontab=parse_cron, kwargs='{"name":"WSJ"}',
                            queue='normal',

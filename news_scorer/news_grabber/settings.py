@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Hong_Kong'
+TIME_ZONE = os.environ.get('LOCAL_TZ_STR', '')
 
 USE_I18N = True
 
@@ -151,7 +151,7 @@ else:
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Hong_Kong'
+CELERY_TIMEZONE = os.environ.get('LOCAL_TZ_STR', '')
 
 # DRF
 REST_FRAMEWORK = {
