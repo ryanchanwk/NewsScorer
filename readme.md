@@ -15,7 +15,7 @@ Here is the process flow:
 If you are first time to use Django, you may check the reference part first.
 
 ### Installation
-1. Add .env in /news_scorer/news_scorer/env folder, and change DJANGO_SECRET_KEY and POSTGRES info
+1. Add .env in /news_scorer/news_scorer/env folder, and change DJANGO_SECRET_KEY, LOCAL_TZ_STR and POSTGRES info
 ```BROKER_TYPE=REDIS
 CELERY_BROKER_URL_REDIS=redis://redis:6379/1
 DJANGO_SECRET_KEY=""
@@ -24,7 +24,7 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres_pw
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
-LOCAL_TZ_STR=Asia/Hong_Kong
+LOCAL_TZ_STR=Asia/Hong_Kong {pls change timezone based on your local timezone}
 DJANGO_SECRET_KEY={pls replace this}
 ```
 2. Download nlp_package content to /news_scorer/news_scorer/nlp_package
