@@ -51,3 +51,6 @@ DJANGO_SECRET_KEY={pls replace this}
 - Tensorflow Documents
 - Huggingface Documents
   - https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment
+    
+### System requirements
+- Due to intensive NLP works, minimum 6GB RAM (not GPU Memory) and 2-core CPU is required.
