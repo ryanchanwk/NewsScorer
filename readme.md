@@ -27,8 +27,8 @@ POSTGRES_PORT=5432
 LOCAL_TZ_STR=Asia/Hong_Kong {pls change timezone based on your local timezone}
 DJANGO_SECRET_KEY={pls replace this}
 ```
-2. Download nlp_package content to /news_scorer/news_scorer/nlp_package
-   Link: https://drive.google.com/file/d/1-O3PvgQ4iJnPKuSt7NHwuO5bSmNJhioB/view?usp=sharing
+2. Download nlp_package content to /news_scorer/news_scorer/nlp_package (PATH UPDATED @20220517)
+   Link: https://drive.google.com/drive/folders/1nEQkRTAneL76fgQdTrUIo7S6QchY_6Kw?usp=sharing
 2. docker-compose up -d --build
 3. docker exec -it news_scorer-web-1 python3 manage.py migrate
 4. docker exec -it news_scorer-web-1 python3 manage.py createsuperuser
