@@ -74,7 +74,7 @@ class WSJParser(BaseParser):
 
     def post_process(self, result_dict):
         month_map = {'Jan.': 'Jan', 'Feb.': 'Feb', 'March': 'Mar',  'April': 'Apr',
-                     'May': 'May', 'Jun.': 'Jun', 'July': 'Jul', 'Aug.': 'Aug',
+                     'May': 'May', 'Jun.': 'Jun', 'June': 'Jun', 'July': 'Jul', 'Aug.': 'Aug',
                      'Sept.': 'Sep', 'Oct.': 'Oct', 'Nov.': 'Nov', 'Dec.': 'Dec'}
         timezone_str = self.news_source.source_timezone
 
